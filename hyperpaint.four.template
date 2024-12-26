@@ -1,0 +1,172 @@
+{{ define "hyperpaint.four.header" -}}
+  {{- if .Status -}}
+    {{- if eq .Status "resolved" -}}{{- "🟢 Восстановление...\n" -}}{{- end -}}
+    {{- if eq .Status "firing" -}}{{- "🔴 Отклонения!\n" -}}{{- end -}}
+  {{- end -}}
+{{- end -}}
+ 
+{{ define "hyperpaint.four.body" -}}
+  {{- if .Status -}}
+    {{- if eq .Status "resolved" -}}{{- "☀ " -}}{{- end -}}
+    {{- if eq .Status "firing" -}}{{- "⛈️ " -}}{{- end -}}
+  {{- end -}}
+
+  {{- if (index .Alerts 0).Labels.alertname -}}
+    {{- (index .Alerts 0).Labels.alertname -}}{{- "\n" -}}
+  {{- end -}}
+
+  {{- range $a := .Alerts -}}
+
+    {{- if $a.Values -}}
+      {{- range $k, $v := $a.Values -}}
+        {{/* Пропустить технические переменные */}}
+        {{- if eq (len $k) 1 -}}{{- continue -}}{{- end -}}
+
+        {{/* Отобразить переменные */}} 
+        {{- "🌀 " -}}{{ $k }}: {{ $v }}{{- "\n" -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- if $a.Labels -}}
+      {{- range $k, $v := $a.Labels -}}
+        {{/* Пропустить технические переменные */}}
+        {{- if eq $k "_test" -}}{{- continue -}}{{- end -}}
+        {{- if eq $k "_onlyfiring" -}}{{- continue -}}{{- end -}}
+
+        {{- if eq $k "asds_id" -}}{{- continue -}}{{- end -}}
+        {{- if eq $k "ASDS_ID" -}}{{- continue -}}{{- end -}}
+        {{- if eq $k "ci_id" -}}{{- continue -}}{{- end -}}
+        {{- if eq $k "CI_ID" -}}{{- continue -}}{{- end -}}
+
+        {{/* Пропустить технические переменные Grafana */}}
+        {{- if eq $k "grafana_folder" -}}{{- continue -}}{{- end -}}
+        {{- if eq $k "alertname" -}}{{- continue -}}{{- end -}}
+
+        {{/* Пропустить технические переменные Prometheus / VictoriaMetrics */}}
+        {{- if eq $k "job" -}}{{- continue -}}{{- end -}}
+
+        {{/* Отобразить переменные */}}
+        {{- "• " -}}{{ $k }}: {{ $v }}{{- "\n" -}}
+      {{- end -}}
+    {{- end -}}  
+
+  {{- end -}}
+
+  {{/* Отобразить краткое описание */}}
+  {{- if (index .Alerts 0).Annotations.summary -}}
+    {{- "💬 " -}}{{ (index .Alerts 0).Annotations.summary -}}{{- "\n" -}}
+  {{- end -}}
+
+{{- end -}}
+
+{{ define "hyperpaint.four.body.full" -}}
+  {{- if .Status -}}
+    {{- if eq .Status "resolved" -}}{{- "☀ " -}}{{- end -}}
+    {{- if eq .Status "firing" -}}{{- "⛈️ " -}}{{- end -}}
+  {{- end -}}
+
+  {{- if (index .Alerts 0).Labels.alertname -}}
+    {{- (index .Alerts 0).Labels.alertname -}}{{- "\n" -}}
+  {{- end -}}
+
+  {{- range $a := .Alerts -}}
+
+    {{- if $a.Values -}}
+      {{- range $k, $v := $a.Values -}}
+        {{/* Пропустить технические переменные */}}
+        {{- if eq (len $k) 1 -}}{{- continue -}}{{- end -}}
+
+        {{/* Отобразить переменные */}} 
+        {{- "🌀 " -}}{{ $k }}: {{ $v }}{{- "\n" -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- if $a.Labels -}}
+      {{- range $k, $v := $a.Labels -}}
+        {{/* Пропустить технические переменные */}}
+        {{- if eq $k "_test" -}}{{- continue -}}{{- end -}}
+        {{- if eq $k "_onlyfiring" -}}{{- continue -}}{{- end -}}
+
+        {{- if eq $k "asds_id" -}}{{- continue -}}{{- end -}}
+        {{- if eq $k "ASDS_ID" -}}{{- continue -}}{{- end -}}
+        {{- if eq $k "ci_id" -}}{{- continue -}}{{- end -}}
+        {{- if eq $k "CI_ID" -}}{{- continue -}}{{- end -}}
+
+        {{/* Пропустить технические переменные Grafana */}}
+        {{- if eq $k "grafana_folder" -}}{{- continue -}}{{- end -}}
+        {{- if eq $k "alertname" -}}{{- continue -}}{{- end -}}
+
+        {{/* Пропустить технические переменные Prometheus / VictoriaMetrics */}}
+        {{- if eq $k "job" -}}{{- continue -}}{{- end -}}
+
+        {{/* Отобразить переменные */}}
+        {{- "• " -}}{{ $k }}: {{ $v }}{{- "\n" -}}
+      {{- end -}}
+    {{- end -}} 
+
+    {{/* Отобразить ссылки */}}
+    {{- if $a.PanelURL -}}
+      {{- if ne $a.PanelURL "" -}}
+        {{- "• панель 👀 " -}}{{ $a.PanelURL -}}{{- "\n" -}}
+      {{- end -}}
+    {{- else -}}
+      {{- if $a.DashboardURL -}}
+        {{- if ne $a.DashboardURL "" -}}
+          {{- "• дашборд 👀 " -}}{{ $a.DashboardURL -}}{{- "\n" -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+
+  {{- end -}}
+
+  {{/* Отобразить краткое описание */}}
+  {{- if (index .Alerts 0).Annotations.summary -}}
+    {{- "💬 " -}}{{ (index .Alerts 0).Annotations.summary -}}{{- "\n" -}}
+  {{- end -}}
+
+{{- end -}}
+
+{{ define "hyperpaint.four.footer" -}}
+  {{ "\n@HyperPaintBot" }}
+{{- end -}}
+
+{{ define "hyperpaint.four.footer.full" -}}
+  {{- if (index .Alerts 0).Annotations.description -}}
+    {{- "💬 Подробнее\n" -}}{{ (index .Alerts 0).Annotations.description -}}{{- "\n" -}}
+  {{- end -}}
+
+  {{- if (index .Alerts 0).Annotations.runbook_url -}}
+    {{- "💬 Инструкция\n" -}}{{ (index .Alerts 0).Annotations.runbook_url -}}{{- "\n" -}}
+  {{- end -}}
+
+  {{/* Отобразить ссылки */}}
+  {{- if .SilenceURL -}}
+    {{- if ne .SilenceURL "" -}}
+      {{- "🔇 Заглушить\n" -}}{{ .SilenceURL -}}{{- "\n" -}}
+    {{- end -}}
+  {{- end -}} 
+
+  {{ "\n@HyperPaintBot" }}
+{{- end -}}
+ 
+{{ define "hyperpaint.four" -}}
+  {{- template "hyperpaint.four.header" . -}}
+  {{- template "hyperpaint.four.body" . -}}
+  {{- template "hyperpaint.four.footer" . -}}
+{{- end -}}
+ 
+{{ define "hyperpaint.four.short" -}}
+  {{- template "hyperpaint.four.body" . -}}
+  {{- template "hyperpaint.four.footer" . -}}
+{{- end -}}
+ 
+{{ define "hyperpaint.four.full" -}}
+  {{- template "hyperpaint.four.body.full" . -}}
+  {{- template "hyperpaint.four.footer.full" . -}}
+{{- end -}}
+
+{{ template "hyperpaint.four" . }}
+
+{{ template "hyperpaint.four.short" . }}
+
+{{ template "hyperpaint.four.full" . }}
